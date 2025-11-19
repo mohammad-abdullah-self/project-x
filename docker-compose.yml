@@ -1,0 +1,46 @@
+services:
+  nuxt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nuxt-project-x-dev
+    container_name: nuxt_project_x_dev
+    volumes:
+      - .:/app:delegated
+      # persist container node_modules so host OS/Bun mismatch is avoided
+      - nuxt_node_modules_dev:/app/node_modules
+    environment:
+      # make Nuxt/Nitro listen on all interfaces so host can access container
+      NITRO_HOST: ${NITRO_HOST:-0.0.0.0}
+      NITRO_PORT: ${NITRO_PORT:-3000}
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - app-nuxt-dev-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: nuxt_project-x_db_dev
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-nuxt}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_DATABASE:-nuxtdb}
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-nuxt-dev-network
+    restart: unless-stopped
+
+volumes:
+  pgdata_dev:
+  nuxt_node_modules_dev:
+
+networks:
+  app-nuxt-dev-network:
+    driver: bridge
