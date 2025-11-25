@@ -7,4 +7,7 @@ export default defineNuxtConfig({
       appUrl: process.env.NUXT_PUBLIC_APP_URL,
     },
   },
+  build: {
+    transpile: ["trpc-nuxt"],
+  },
 });

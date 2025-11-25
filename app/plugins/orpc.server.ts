@@ -4,7 +4,7 @@ import { router } from "~~/server/router";
 export default defineNuxtPlugin((nuxt) => {
   const event = useRequestEvent();
 
-  const client = createRouterClient(router, {
+  const orpc = createRouterClient(router, {
     context: {
       headers: event?.headers, // provide headers if initial context required
     },
@@ -12,7 +12,7 @@ export default defineNuxtPlugin((nuxt) => {
 
   return {
     provide: {
-      client,
+      orpc,
     },
   };
 });
