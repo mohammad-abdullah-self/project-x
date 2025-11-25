@@ -8,7 +8,7 @@ const PlanetSchema = z.object({
 });
 
 export const listPlanet = os.output(PlanetSchema).handler(() => {
-  return { id: 1, name: "name", description: "description" };
+  return { id: 1, name: "Smith", description: "description" };
 });
 
 export default {

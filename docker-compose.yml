@@ -11,12 +11,12 @@ services:
       - nuxt_node_modules_dev:/app/node_modules
     environment:
       # make Nuxt/Nitro listen on all interfaces so host can access container
-      NITRO_HOST: ${NITRO_HOST:-0.0.0.0}
-      NITRO_PORT: ${NITRO_PORT:-3000}
+      NITRO_HOST: ${NITRO_HOST}
+      NITRO_PORT: ${NITRO_PORT}
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: ${NODE_ENV}
     ports:
-      - "3000:3000"
+      - "${NITRO_PORT}:3000"
     depends_on:
       - db
     networks:
@@ -27,19 +27,19 @@ services:
     image: postgres:16-alpine
     container_name: nuxt_project-x_db_dev
     environment:
-      POSTGRES_USER: ${DB_USERNAME:-nuxt}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
-      POSTGRES_DB: ${DB_DATABASE:-nuxtdb}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
     volumes:
-      - pgdata_dev:/var/lib/postgresql/data
+      - pg_db_data_dev:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     networks:
       - app-nuxt-dev-network
     restart: unless-stopped
 
 volumes:
-  pgdata_dev:
+  pg_db_data_dev:
   nuxt_node_modules_dev:
 
 networks:

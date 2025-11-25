@@ -1,19 +1,14 @@
-import { createORPCClient } from "@orpc/client";
-import { RPCLink } from "@orpc/client/fetch";
-import type { RouterClient } from "@orpc/server";
-import type { router } from "~~/server/routes/rpc/router";
+import { createRouterClient } from "@orpc/server";
+import { router } from "~~/server/router";
 
-export default defineNuxtPlugin(() => {
-  const link = new RPCLink({
-    url: `${
-      typeof window !== "undefined"
-        ? window.location.origin
-        : "http://localhost:3000"
-    }/rpc`,
-    headers: () => ({}),
+export default defineNuxtPlugin((nuxt) => {
+  const event = useRequestEvent();
+
+  const client = createRouterClient(router, {
+    context: {
+      headers: event?.headers, // provide headers if initial context required
+    },
   });
-
-  const client: RouterClient<typeof router> = createORPCClient(link);
 
   return {
     provide: {
