@@ -1,47 +1,37 @@
 services:
-  nuxt:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: nuxt-project-x-dev
-    container_name: nuxt_project_x_dev
-    volumes:
-      - .:/app:delegated
-      # persist container node_modules so host OS/Bun mismatch is avoided
-      - nuxt_node_modules_dev:/app/node_modules
-    environment:
-      # make Nuxt/Nitro listen on all interfaces so host can access container
-      NITRO_HOST: ${NITRO_HOST}
-      NITRO_PORT: ${NITRO_PORT}
-      DATABASE_URL: ${DATABASE_URL}
-      NODE_ENV: ${NODE_ENV}
-    ports:
-      - "${NITRO_PORT}:3000"
-    depends_on:
-      - db
-    networks:
-      - app-nuxt-dev-network
-    restart: unless-stopped
-
   db:
     image: postgres:16-alpine
-    container_name: nuxt_project-x_db_dev
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
-    volumes:
-      - pg_db_data_dev:/var/lib/postgresql/data
-    ports:
-      - "${DB_PORT}:5432"
-    networks:
-      - app-nuxt-dev-network
+    container_name: postgres_16_alpine_dev
     restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: postgres_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user -d postgres_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: pgbouncer
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # pgbouncer listens on port 6432 internally; we publish 6432
+      DATABASE_URL: "postgresql://postgres_user:postgres_password@localhost:5432/postgres_db"
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+    ports:
+      - "6432:6432"
 
 volumes:
-  pg_db_data_dev:
-  nuxt_node_modules_dev:
-
-networks:
-  app-nuxt-dev-network:
-    driver: bridge
+  db_data:

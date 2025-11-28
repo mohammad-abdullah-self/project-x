@@ -7,7 +7,11 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "bunx tsx ./server/db/seed.ts",
+    "db:generate-tenant": "bunx drizzle-kit generate --config drizzle-tenant.config.ts"
   },
   "dependencies": {
     "@orpc/client": "^1.11.3",
@@ -15,11 +19,19 @@
     "@orpc/server": "^1.11.3",
     "@trpc/client": "^11.7.2",
     "@trpc/server": "^11.7.2",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.44.7",
     "install": "^0.13.0",
     "nuxt": "^4.2.1",
+    "pg": "^8.16.3",
     "trpc-nuxt": "^1.2.0",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3",
     "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.6",
+    "drizzle-kit": "^0.31.7",
+    "tsx": "^4.20.6"
   }
 }
