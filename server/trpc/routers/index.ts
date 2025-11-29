@@ -1,5 +1,6 @@
 import { baseProcedure, createTRPCRouter } from "~~/server/trpc/init";
 import { z } from "zod";
+import { usersTable } from "~~/server/db/schema_tenant";
 
 export const appRouter = createTRPCRouter({
   hello: baseProcedure
@@ -13,6 +14,10 @@ export const appRouter = createTRPCRouter({
         greeting: `hello ${opts.input.text}`,
       };
     }),
+
+  tenantUsers: baseProcedure.query(async ({ ctx }) => {
+    return await ctx.db.select().from(usersTable);
+  }),
 });
 
 // export type definition of API

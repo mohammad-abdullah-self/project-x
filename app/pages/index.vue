@@ -12,6 +12,8 @@ const { data: helloFromTrpc } = await $trpc.hello.useQuery({
   text: "world from TRPC",
 });
 console.log("helloFromTrpc", helloFromTrpc.value?.greeting);
+
+const { data: tenantUsers } = await $trpc.tenantUsers.useQuery();
 </script>
 <template>
   <h1>New Index page</h1>
@@ -19,4 +21,5 @@ console.log("helloFromTrpc", helloFromTrpc.value?.greeting);
   <pre>Hello ORPC: {{ helloFromOrpc }}</pre>
   <pre>Hello API: {{ helloFromApi }}</pre>
   <pre>Hello TRPC: {{ helloFromTrpc?.greeting }}</pre>
+  <pre>Tenant Users: {{ JSON.stringify(tenantUsers) }}</pre>
 </template>

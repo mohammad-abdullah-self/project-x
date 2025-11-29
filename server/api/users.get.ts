@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const tenantId = (event as any).context.tenantId;
   const tenantDbName = `tenant_${tenantId}`;
 
-  const tenantDbUrl = `${runtimeConfig.db.tenantDbUrl}/${tenantDbName}`;
+  const tenantDbUrl = `${runtimeConfig.db.tenantPgbDbUrl}/${tenantDbName}`;
   const db = getOrCreateTenantDb(tenantDbUrl);
   // run queries via Drizzle
   const users = await db.select().from(usersTable);

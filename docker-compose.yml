@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: postgres_password
       POSTGRES_DB: postgres_db
       PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_HOST_AUTH_METHOD: md5
+      POSTGRES_INITDB_ARGS: "--auth=md5"
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
@@ -20,16 +22,17 @@ services:
 
   pgbouncer:
     image: edoburu/pgbouncer:latest
-    container_name: pgbouncer
-    restart: unless-stopped
     depends_on:
       - db
     environment:
-      # pgbouncer listens on port 6432 internally; we publish 6432
-      DATABASE_URL: "postgresql://postgres_user:postgres_password@localhost:5432/postgres_db"
-    volumes:
-      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
-      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres_user
+      DB_PASSWORD: postgres_password
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 500
+      DEFAULT_POOL_SIZE: 20
+      ADMIN_USERS: "postgres_user,postgres,admin"
     ports:
       - "6432:6432"
 
