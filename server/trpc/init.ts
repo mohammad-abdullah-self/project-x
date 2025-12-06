@@ -1,6 +1,7 @@
 import { initTRPC } from "@trpc/server";
 import type { H3Event } from "h3";
-import { TrpcContext } from "./context";
+import superjson from "superjson";
+// import { TrpcContext } from "./context";
 
 // export const createTRPCContext = async (event: H3Event) => {
 //   console.log("createTRPCContext", event.context.tenantId);
@@ -15,11 +16,11 @@ import { TrpcContext } from "./context";
 // since it's not very descriptive.
 // For instance, the use of a t variable
 // is common in i18n libraries.
-const t = initTRPC.context<TrpcContext>().create({
+const t = initTRPC.create({
   /**
    * @see https://trpc.io/docs/server/data-transformers
    */
-  // transformer: superjson,
+  transformer: superjson,
 });
 
 // Base router and procedure helpers

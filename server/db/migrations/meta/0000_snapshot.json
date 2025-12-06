@@ -1,11 +1,11 @@
 {
-  "id": "ec2bc44a-e279-4a70-8c18-df1dc7a41e28",
+  "id": "15a65084-b793-42c0-90ea-c8b2e9bd3d87",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.tenants": {
-      "name": "tenants",
+    "public.invoices": {
+      "name": "invoices",
       "schema": "",
       "columns": {
         "id": {
@@ -14,50 +14,199 @@
           "primaryKey": true,
           "notNull": true
         },
-        "tenant": {
-          "name": "tenant",
-          "type": "varchar(100)",
+        "invoice_number": {
+          "name": "invoice_number",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": true
         },
-        "db_url": {
-          "name": "db_url",
-          "type": "text",
+        "subscription_id": {
+          "name": "subscription_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "real",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'BDT'"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invoices_subscription_id_subscriptions_id_fk": {
+          "name": "invoices_subscription_id_subscriptions_id_fk",
+          "tableFrom": "invoices",
+          "tableTo": "subscriptions",
+          "columnsFrom": [
+            "subscription_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "invoices_invoice_number_unique": {
+          "name": "invoices_invoice_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "invoice_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ipn_logs": {
+      "name": "ipn_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tran_id": {
+          "name": "tran_id",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_payload": {
+          "name": "raw_payload",
+          "type": "json",
+          "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "tenants_tenant_unique": {
-          "name": "tenants_tenant_unique",
+        "ipn_logs_tran_id_unique": {
+          "name": "ipn_logs_tran_id_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "tenant"
+            "tran_id"
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subscriptions": {
+      "name": "subscriptions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan": {
+          "name": "plan",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'monthly'"
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1000
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subscriptions_user_id_users_id_fk": {
+          "name": "subscriptions_user_id_users_id_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -74,19 +223,13 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "age": {
-          "name": "age",
-          "type": "integer",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },
         "email": {
           "name": "email",
-          "type": "varchar(255)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },
@@ -94,14 +237,15 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},

@@ -1,25 +1,30 @@
 <script setup lang="ts">
-const { $trpc, $orpc } = useNuxtApp();
+interface ApiResponse {
+  GatewayPageURL: string;
+  ok: boolean;
+}
+async function startSubscription() {
+  try {
+    alert("Subscription initiated! Please complete the payment.");
+    const response = await $fetch<ApiResponse>("/api/sslcommerz/init", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-// const greeting = await client.greeting.greeting({ name: "Jhon" });
-const helloFromOrpc = await $orpc.hello.hello();
-console.log("helloFromOrpc", helloFromOrpc);
-const { data: helloFromApi } = await useFetch("/api/hello", {
-  server: false,
-});
-
-const { data: helloFromTrpc } = await $trpc.hello.useQuery({
-  text: "world from TRPC",
-});
-console.log("helloFromTrpc", helloFromTrpc.value?.greeting);
-
-const { data: tenantUsers } = await $trpc.tenantUsers.useQuery();
+    await navigateTo(response.GatewayPageURL, {
+      external: true,
+    });
+  } catch (error) {
+    console.error("Error initiating subscription:", error);
+    alert("Failed to initiate subscription. Please try again.");
+  }
+}
 </script>
+
 <template>
-  <h1>New Index page</h1>
-  <!-- <pre>Greeting: {{ greeting }}</pre> -->
-  <pre>Hello ORPC: {{ helloFromOrpc }}</pre>
-  <pre>Hello API: {{ helloFromApi }}</pre>
-  <pre>Hello TRPC: {{ helloFromTrpc?.greeting }}</pre>
-  <pre>Tenant Users: {{ JSON.stringify(tenantUsers) }}</pre>
+  <div>
+    <button type="button" @click="startSubscription">Pay 9.99 BDT</button>
+  </div>
 </template>
